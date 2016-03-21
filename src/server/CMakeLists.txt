@@ -6,21 +6,38 @@
 # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-file(GLOB_RECURSE sources_Network Network/*.cpp Network/*.h)
-
 file(GLOB sources_localdir *.cpp *.h)
 
-set(shared_STAT_SRCS
-  ${shared_STAT_SRCS}
-  ${sources_Network}
+set(server_SRCS
+  ${server_SRCS}
   ${sources_localdir}
 )
 
 include_directories(
   ${CMAKE_BINARY_DIR}
+  ${CMAKE_SOURCE_DIR}/src/shared
+  ${CMAKE_SOURCE_DIR}/src/shared/Network
   ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-add_library(shared STATIC
-  ${shared_STAT_SRCS}
+add_executable(server
+  ${server_SRCS}
 )
+
+if( UNIX AND NOT NOJEM AND NOT APPLE )
+  set(server_LINK_FLAGS "-pthread -lncurses ${server_LINK_FLAGS}")
+endif()
+
+set_target_properties(server PROPERTIES LINK_FLAGS "${server_LINK_FLAGS}")
+
+target_link_libraries(server
+  #game
+  shared
+  ${Boost_LIBRARIES}
+)
+
+if( UNIX )
+  install(TARGETS server DESTINATION bin)
+elseif( WIN32 )
+  install(TARGETS server DESTINATION "${CMAKE_INSTALL_PREFIX}")
+endif()
