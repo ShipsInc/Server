@@ -29,9 +29,7 @@
 class NetworkThread
 {
 public:
-    NetworkThread() : _connections(0), _stopped(false), _thread(nullptr)
-    {
-    }
+    NetworkThread() : _connections(0), _stopped(false), _thread(nullptr) { }
 
     virtual ~NetworkThread()
     {
@@ -59,8 +57,6 @@ public:
 
     void Wait()
     {
-        //ASSERT(_thread);
-
         _thread->join();
         delete _thread;
         _thread = nullptr;

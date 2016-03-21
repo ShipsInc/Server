@@ -73,4 +73,5 @@ int main()
     ServerUpdateLoop();
 
 	sSocketMgr.StopNetwork();
+    return 0;
 }
