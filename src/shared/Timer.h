@@ -13,29 +13,28 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SHIPS_DEFINE_H
-#define SHIPS_DEFINE_H
+#ifndef TIMER_H
+#define TIMER_H
 
-#include <cstddef>
-#include <cinttypes>
-#include <climits>
-#include <atomic>
-#include <iostream>
-#include <cstddef>
-#include <cinttypes>
-#include <climits>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
+#include <chrono>
+#include "Define.h"
 
-typedef int64_t int64;
-typedef int32_t int32;
-typedef int16_t int16;
-typedef int8_t int8;
-typedef uint64_t uint64;
-typedef uint32_t uint32;
-typedef uint16_t uint16;
-typedef uint8_t uint8;
+using namespace std::chrono;
 
-#endif //SHIPS_DEFINE_H
+inline uint32 getMSTime()
+{
+    static const system_clock::time_point ApplicationStartTime = system_clock::now();
+
+    return uint32(duration_cast<milliseconds>(system_clock::now() - ApplicationStartTime).count());
+}
+
+inline uint32 getMSTimeDiff(uint32 oldMSTime, uint32 newMSTime)
+{
+    // getMSTime() have limited data range and this is case when it overflow in this tick
+    if (oldMSTime > newMSTime)
+        return (0xFFFFFFFF - oldMSTime) + newMSTime;
+    else
+        return newMSTime - oldMSTime;
+}
+
+#endif

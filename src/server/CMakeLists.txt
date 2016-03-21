@@ -6,10 +6,12 @@
 # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
+file(GLOB_RECURSE sources_Session Session/*.cpp Session/*.h)
 file(GLOB sources_localdir *.cpp *.h)
 
 set(server_SRCS
   ${server_SRCS}
+  ${sources_Session}
   ${sources_localdir}
 )
 

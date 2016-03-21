@@ -14,25 +14,63 @@
 */
 
 #include <iostream>
-#include <boost/asio/io_service.hpp>
-#include <boost/asio/deadline_timer.hpp>
 #include "SocketMgr.h"
+#include "Timer.h"
+#include "Server.h"
+
+#include <boost/asio/io_service.hpp>
+#include <boost/bind/bind.hpp>
 
 boost::asio::io_service _ioService;
+
+#define SERVER_SLEEP_CONST 50
+#define PORT 8085
+#define THREAD_POOL 2
+
+void ServerUpdateLoop()
+{
+    uint32 realCurrTime = 0;
+    uint32 realPrevTime = getMSTime();
+
+    uint32 prevSleepTime = 0;
+
+    ///- Work server
+    while (!Server::IsStopped())
+    {
+        ++Server::m_serverLoopCounter;
+        realCurrTime = getMSTime();
+
+        uint32 diff = getMSTimeDiff(realPrevTime, realCurrTime);
+
+        sServer->Update(diff);
+        realPrevTime = realCurrTime;
+
+        if (diff <= SERVER_SLEEP_CONST + prevSleepTime)
+        {
+            prevSleepTime = SERVER_SLEEP_CONST + prevSleepTime - diff;
+            std::this_thread::sleep_for(std::chrono::milliseconds(prevSleepTime));
+        }
+        else
+            prevSleepTime = 0;
+    }
+}
 
 int main()
 {
 	std::cout << "Ships: Start server" << std::endl;
 
-	sSocketMgr.StartNetwork(_ioService, "0.0.0.0", 8085);
-	_ioService.run();
+    sSocketMgr.StartNetwork(_ioService, "0.0.0.0", PORT);
 
-	for (;;)
-	{
-		std::this_thread::sleep_for(std::chrono::seconds(1));
-	}
+    // Start the Boost based thread pool
+    int numThreads = THREAD_POOL;
+    std::vector<std::thread> threadPool;
+    if (numThreads < 1)
+        numThreads = 1;
+
+    for (int i = 0; i < numThreads; ++i)
+        threadPool.push_back(std::thread(boost::bind(&boost::asio::io_service::run, &_ioService)));
+
+    ServerUpdateLoop();
 
 	sSocketMgr.StopNetwork();
-
-	system("pause");
 }

@@ -103,7 +103,7 @@ protected:
     {
 		std::cout << "Network Thread Starting" << std::endl;
 
-        SocketSet::iterator i, t;
+        SocketSet::iterator i;
 
         uint32 sleepTime = 10;
         uint32 tickStart = 0, diff = 0;
@@ -122,7 +122,6 @@ protected:
                     if ((*i)->IsOpen())
                         (*i)->CloseSocket();
 
-					std::cout << "Remove Socket from thread" << std::endl;
                     --_connections;
                     _Sockets.erase(i++);
                 }
