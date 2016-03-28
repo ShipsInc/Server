@@ -28,6 +28,7 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/Protocol
   ${CMAKE_CURRENT_SOURCE_DIR}/Server
   ${CMAKE_CURRENT_SOURCE_DIR}/Session
+  ${MYSQL_INCLUDE_DIR}
 )
 
 add_executable(server
@@ -43,6 +44,7 @@ set_target_properties(server PROPERTIES LINK_FLAGS "${server_LINK_FLAGS}")
 target_link_libraries(server
   shared
   ${Boost_LIBRARIES}
+  ${MYSQL_LIBRARY}
 )
 
 if( UNIX )

@@ -36,6 +36,7 @@ include(CheckIncludeFiles)
 include(CheckPlatform)
 
 include(ConfigureBoost)
+find_package(MySQL REQUIRED)
 
 # add core sources
 add_subdirectory(src)

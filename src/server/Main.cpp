@@ -17,6 +17,7 @@
 #include "SocketMgr.h"
 #include "Timer.h"
 #include "Server.h"
+#include "Database/DatabaseEnv.h"
 
 #include <boost/asio/io_service.hpp>
 #include <boost/bind/bind.hpp>
@@ -26,6 +27,8 @@ boost::asio::io_service _ioService;
 #define SERVER_SLEEP_CONST 50
 #define PORT 8085
 #define THREAD_POOL 2
+
+MySQLConnection Database;
 
 void ServerUpdateLoop()
 {
@@ -59,6 +62,9 @@ int main()
 {
 	std::cout << "Ships: Start server" << std::endl;
 
+    if (!Database.Open(MySQLConnectionInfo("localhost", "3036", "database", "root", "root")))
+        return 0;
+
     sSocketMgr.StartNetwork(_ioService, "0.0.0.0", PORT, 1);
 
     // Start the Boost based thread pool
@@ -73,5 +79,6 @@ int main()
     ServerUpdateLoop();
 
     sSocketMgr.StopNetwork();
+    Database.Close();
     return 0;
 }

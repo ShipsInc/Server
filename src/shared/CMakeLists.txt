@@ -6,12 +6,14 @@
 # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
+file(GLOB_RECURSE sources_Database Database/*.cpp Database/*.h)
 file(GLOB_RECURSE sources_Packets Packets/*.cpp Packets/*.h)
 
 file(GLOB sources_localdir *.cpp *.h)
 
 set(shared_STAT_SRCS
   ${shared_STAT_SRCS}
+  ${sources_Database}
   ${sources_Packets}
   ${sources_localdir}
 )
@@ -21,6 +23,8 @@ include_directories(
   ${CMAKE_BINARY_DIR}/src/server
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}/Packets
+  ${CMAKE_CURRENT_SOURCE_DIR}/Database
+  ${MYSQL_INCLUDE_DIR}
 )
 
 add_library(shared STATIC
