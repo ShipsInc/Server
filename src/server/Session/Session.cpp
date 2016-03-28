@@ -14,6 +14,8 @@
 */
 
 #include "Session.h"
+#include "Packet.h"
+#include "Socket.h"
 
 // Session constructor
 Session::Session(uint32 id, std::string&& name, std::shared_ptr<Socket> sock) : m_accountId(id), m_accountName(std::move(name)), m_forceExit(false), m_timeOutTime(0)
@@ -60,4 +62,9 @@ bool Session::Update(uint32 diff)
         return false;
 
     return true;
+}
+
+void Session::SendPacket(Packet const* packet)
+{
+    m_Socket->SendPacket(*packet);
 }

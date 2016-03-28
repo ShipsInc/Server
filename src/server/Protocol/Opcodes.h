@@ -13,30 +13,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SHIPS_DEFINE_H
-#define SHIPS_DEFINE_H
+#ifndef _OPCODES_H
+#define _OPCODES_H
 
-#include <cstddef>
-#include <cinttypes>
-#include <climits>
-#include <atomic>
-#include <iostream>
-#include <cstddef>
-#include <cinttypes>
-#include <climits>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
-#include <memory>
+enum OpcodeMisc : uint32
+{
+    MAX_OPCODE                                                     = 0x1FFF,
+    NUM_OPCODE_HANDLERS                                            = (MAX_OPCODE + 1),
+    UNKNOWN_OPCODE                                                 = (0xFFFF + 1),
+    NULL_OPCODE                                                    = 0xBADD
+};
 
-typedef int64_t int64;
-typedef int32_t int32;
-typedef int16_t int16;
-typedef int8_t int8;
-typedef uint64_t uint64;
-typedef uint32_t uint32;
-typedef uint16_t uint16;
-typedef uint8_t uint8;
-
-#endif //SHIPS_DEFINE_H
+#endif

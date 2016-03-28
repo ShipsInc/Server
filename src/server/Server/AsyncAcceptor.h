@@ -1,6 +1,4 @@
 /*
-* Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
-*
 * This program is free software; you can redistribute it and/or modify it
 * under the terms of the GNU General Public License as published by the
 * Free Software Foundation; either version 2 of the License, or (at your
@@ -50,7 +48,7 @@ public:
                 }
                 catch (boost::system::system_error const& err)
                 {
-					std::cout << "Failed to initialize client's socket " << err.what() << std::endl;
+                    std::cout << "Failed to initialize client's socket " << err.what() << std::endl;
                 }
             }
 
@@ -88,7 +86,7 @@ void AsyncAcceptor::AsyncAccept()
             }
             catch (boost::system::system_error const& err)
             {
-				std::cout << "Failed to retrieve client's remote address " << err.what() << std::endl;
+                std::cout << "Failed to retrieve client's remote address " << err.what() << std::endl;
             }
         }
 

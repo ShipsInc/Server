@@ -59,7 +59,7 @@ int main()
 {
 	std::cout << "Ships: Start server" << std::endl;
 
-    sSocketMgr.StartNetwork(_ioService, "0.0.0.0", PORT);
+    sSocketMgr.StartNetwork(_ioService, "0.0.0.0", PORT, 1);
 
     // Start the Boost based thread pool
     int numThreads = THREAD_POOL;
@@ -72,6 +72,6 @@ int main()
 
     ServerUpdateLoop();
 
-	sSocketMgr.StopNetwork();
+    sSocketMgr.StopNetwork();
     return 0;
 }

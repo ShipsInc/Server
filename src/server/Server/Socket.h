@@ -1,6 +1,4 @@
 /*
- * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
- *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation; either version 2 of the License, or (at your
@@ -19,6 +17,8 @@
 #define __SOCKET_H__
 
 #include "MessageBuffer.h"
+#include "Opcodes.h"
+#include "Packet.h"
 #include <atomic>
 #include <vector>
 #include <mutex>
@@ -30,9 +30,20 @@
 #include <boost/asio/write.hpp>
 #include <boost/asio/read.hpp>
 
+class Session;
+
 using boost::asio::ip::tcp;
 
 using namespace boost::asio;
+
+struct ClientHeader
+{
+    uint16 Size;
+    uint16 Command;
+
+    static bool IsValidSize(uint32 size) { return size < 10240; }
+    static bool IsValidOpcode(uint32 opcode) { return opcode < NUM_OPCODE_HANDLERS; }
+};
 
 #define READ_BLOCK_SIZE 4096
 #ifdef BOOST_ASIO_HAS_IOCP
@@ -42,17 +53,12 @@ using namespace boost::asio;
 class Socket : public std::enable_shared_from_this<Socket>
 {
 public:
-    explicit Socket(tcp::socket&& socket) : _socket(std::move(socket)), _remoteAddress(_socket.remote_endpoint().address()),
-        _remotePort(_socket.remote_endpoint().port()), _readBuffer(), _closed(false), _closing(false), _isWritingAsync(false)
-    {
-        _readBuffer.Resize(READ_BLOCK_SIZE);
-    }
+    explicit Socket(tcp::socket&& socket);
+    ~Socket();
 
-    ~Socket()
+    void Start()
     {
-        _closed = true;
-        boost::system::error_code error;
-        _socket.close(error);
+        AsyncRead();
     }
 
     bool Update()
@@ -108,37 +114,13 @@ public:
 
     bool IsOpen() const { return !_closed && !_closing; }
 
-    void CloseSocket()
-    {
-        if (_closed.exchange(true))
-            return;
-
-        boost::system::error_code shutdownError;
-        _socket.shutdown(boost::asio::socket_base::shutdown_both, shutdownError);
-		if (shutdownError)
-			std::cout << "Socket::CloseSocket: " << GetRemoteIpAddress().to_string().c_str() << " errored when shutting down socket: " << shutdownError.value() << " (" << shutdownError.message().c_str() << ")";
-
-        OnClose();
-    }
+    void CloseSocket();
 
     /// Marks the socket for closing after write buffer becomes empty
     void DelayedCloseSocket() { _closing = true; }
 
     MessageBuffer& GetReadBuffer() { return _readBuffer; }
-
-	void Start()
-	{
-		AsyncRead();
-	}
-
 protected:
-    void OnClose() { }
-
-	void ReadHandler()
-	{
-		AsyncRead();
-	}
-
     bool AsyncProcessQueue(std::unique_lock<std::mutex>&)
     {
         if (_isWritingAsync)
@@ -284,12 +266,34 @@ private:
 
 #endif
 
+public:
+    void SendPacket(Packet const& packet);
+    void SetSession(Session* session);
+private:
+    void ReadHandler();
+    bool ReadHeaderHandler();
+
+    enum class ReadDataHandlerResult
+    {
+        Ok = 0,
+        Error = 1,
+        WaitingForQuery = 2
+    };
+    void WritePacketToBuffer(Packet const& packet, MessageBuffer& buffer);
+
+    std::mutex _worldSessionLock;
+    Session* _session;
+    bool _authed;
+
     tcp::socket _socket;
 
     boost::asio::ip::address _remoteAddress;
     uint16 _remotePort;
 
     MessageBuffer _readBuffer;
+
+    MessageBuffer _headerBuffer;
+    MessageBuffer _packetBuffer;
 
     std::atomic<bool> _closed;
     std::atomic<bool> _closing;

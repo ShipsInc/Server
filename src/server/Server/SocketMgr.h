@@ -28,29 +28,31 @@ using boost::asio::ip::tcp;
 class SocketMgr
 {
 public:
-    ~SocketMgr()
+    virtual ~SocketMgr()
     {
         //ASSERT(!_threads && !_acceptor && !_threadCount, "StopNetwork must be called prior to SocketMgr destruction");
     }
 
-	static SocketMgr& Instance()
-	{
-		static SocketMgr instance;
-		return instance;
-	}
+    static SocketMgr& Instance()
+    {
+        static SocketMgr instance;
+        return instance;
+    }
 
-	bool StartNetwork(boost::asio::io_service& service, std::string const& bindIp, uint16 port);
-	void StopNetwork();
-	void Wait();
-	void OnSocketOpen(tcp::socket&& sock);
+    bool StartNetwork(boost::asio::io_service& service, std::string const& bindIp, uint16 port, uint16 threads);
+    void StopNetwork();
+    void Wait();
+    void OnSocketOpen(tcp::socket&& sock);
+
     int32 GetNetworkThreadCount() const { return _threadCount; }
+
 protected:
     SocketMgr() : _acceptor(nullptr), _threads(nullptr), _threadCount(1) { }
 
-	NetworkThread* CreateThreads()
-	{
-		return new NetworkThread[GetNetworkThreadCount()];
-	}
+    NetworkThread* CreateThreads()
+    {
+        return new NetworkThread[GetNetworkThreadCount()];
+    }
 
     AsyncAcceptor* _acceptor;
     NetworkThread* _threads;

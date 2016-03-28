@@ -13,11 +13,13 @@
 * with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "Define.h"
 #include "Server.h"
-#include "Socket.h"
+#include "Define.h"
 
 #define SOCKET_TIMEOUT 30000
+
+class Packet;
+class Socket;
 
 class Session
 {
@@ -47,6 +49,8 @@ class Session
         {
             return m_timeOutTime <= 0;
         }
+
+        void SendPacket(Packet const* packet);
     private:
         std::shared_ptr<Socket> m_Socket;
         std::atomic<int32> m_timeOutTime; // Socket timeout

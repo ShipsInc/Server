@@ -18,10 +18,10 @@
 
 #include "Define.h"
 #include "Socket.h"
+#include "Timer.h"
 
 #include <atomic>
 #include <chrono>
-#include <memory>
 #include <mutex>
 #include <set>
 #include <thread>
@@ -31,7 +31,7 @@ class NetworkThread
 public:
     NetworkThread() : _connections(0), _stopped(false), _thread(nullptr) { }
 
-    virtual ~NetworkThread()
+    ~NetworkThread()
     {
         Stop();
         if (_thread)
@@ -67,15 +67,18 @@ public:
         return _connections;
     }
 
-    void AddSocket(std::shared_ptr<Socket> sock)
+    virtual void AddSocket(std::shared_ptr<Socket> sock)
     {
         std::lock_guard<std::mutex> lock(_newSocketsLock);
 
         ++_connections;
         _newSockets.insert(sock);
+        SocketAdded(sock);
     }
 
 protected:
+    void SocketAdded(std::shared_ptr<Socket> /*sock*/) { }
+    void SocketRemoved(std::shared_ptr<Socket> /*sock*/) { }
 
     void AddNewSockets()
     {
@@ -87,7 +90,11 @@ protected:
         for (SocketSet::const_iterator i = _newSockets.begin(); i != _newSockets.end(); ++i)
         {
             if (!(*i)->IsOpen())
+            {
+                SocketRemoved(*i);
+
                 --_connections;
+            }
             else
                 _Sockets.insert(*i);
         }
@@ -97,9 +104,9 @@ protected:
 
     void Run()
     {
-		std::cout << "Network Thread Starting" << std::endl;
+        std::cout << "Network Thread Starting" << std::endl;
 
-        SocketSet::iterator i;
+        SocketSet::iterator i, t;
 
         uint32 sleepTime = 10;
         uint32 tickStart = 0, diff = 0;
@@ -107,7 +114,7 @@ protected:
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(sleepTime));
 
-			tickStart = time(NULL);
+            tickStart = getMSTime();
 
             AddNewSockets();
 
@@ -118,6 +125,8 @@ protected:
                     if ((*i)->IsOpen())
                         (*i)->CloseSocket();
 
+                    SocketRemoved(*i);
+
                     --_connections;
                     _Sockets.erase(i++);
                 }
@@ -125,17 +134,17 @@ protected:
                     ++i;
             }
 
-            diff =  time(NULL) - tickStart;
+            diff = GetMSTimeDiffToNow(tickStart);
             sleepTime = diff > 10 ? 0 : 10 - diff;
         }
 
-		std::cout << "Network Thread exits" << std::endl;
+        std::cout << "Network Thread exits" << std::endl;
         _newSockets.clear();
         _Sockets.clear();
     }
 
 private:
-    typedef std::set<std::shared_ptr<Socket>> SocketSet;
+    typedef std::set<std::shared_ptr<Socket> > SocketSet;
 
     std::atomic<int32> _connections;
     std::atomic<bool> _stopped;
