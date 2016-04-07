@@ -21,7 +21,6 @@
  */
 
 #include "Define.h"
-#include <algorithm>
 
 namespace ByteConverter
 {

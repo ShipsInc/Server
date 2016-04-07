@@ -22,6 +22,7 @@
 #include <thread>
 
 #include "MySQLConnection.h"
+#include <Timer.h>
 
 MySQLConnection::MySQLConnection() : m_Mysql(nullptr), m_connectionInfo(MySQLConnectionInfo()) { }
 

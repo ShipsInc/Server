@@ -16,6 +16,10 @@
 #ifndef DATABASEENV_H
 #define DATABASEENV_H
 
+#ifdef _WIN32
+#include <winsock2.h>
+#endif
+
 #include "MySQLConnection.h"
 #include <mysql.h>
 
