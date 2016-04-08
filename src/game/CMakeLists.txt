@@ -7,14 +7,13 @@
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 file(GLOB_RECURSE sources_Session Session/*.cpp Session/*.h)
-file(GLOB_RECURSE sources_Server Server/*.cpp Server/*.h)
 file(GLOB_RECURSE sources_Protocol Protocol/*.cpp Protocol/*.h)
+
 file(GLOB sources_localdir *.cpp *.h)
 
-set(server_SRCS
-  ${server_SRCS}
+set(game_STAT_SRCS
+  ${game_STAT_SRCS}
   ${sources_Session}
-  ${sources_Server}
   ${sources_Protocol}
   ${sources_localdir}
 )
@@ -23,32 +22,15 @@ include_directories(
   ${CMAKE_BINARY_DIR}
   ${CMAKE_SOURCE_DIR}/src/shared
   ${CMAKE_SOURCE_DIR}/src/shared/Packets
+  ${CMAKE_SOURCE_DIR}/src/shared/Database
   ${CMAKE_SOURCE_DIR}/src/shared/Network
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}/Protocol
-  ${CMAKE_CURRENT_SOURCE_DIR}/Server
   ${CMAKE_CURRENT_SOURCE_DIR}/Session
   ${MYSQL_INCLUDE_DIR}
+  ${BOOST_INCLUDE_DIR}
 )
 
-add_executable(server
-  ${server_SRCS}
+add_library(game STATIC
+  ${game_STAT_SRCS}
 )
-
-if( UNIX AND NOT NOJEM AND NOT APPLE )
-  set(server_LINK_FLAGS "-pthread -lncurses ${server_LINK_FLAGS}")
-endif()
-
-set_target_properties(server PROPERTIES LINK_FLAGS "${server_LINK_FLAGS}")
-
-target_link_libraries(server
-  shared
-  ${Boost_LIBRARIES}
-  ${MYSQL_LIBRARY}
-)
-
-if( UNIX )
-  install(TARGETS server DESTINATION bin)
-elseif( WIN32 )
-  install(TARGETS server DESTINATION "${CMAKE_INSTALL_PREFIX}")
-endif()

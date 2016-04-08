@@ -15,7 +15,7 @@
 
 #include "Server.h"
 #include "Socket.h"
-#include "Session/Session.h"
+#include "Session.h"
 
 std::atomic<bool> Server::m_stopEvent(false);
 std::atomic<uint32> Server::m_serverLoopCounter(0);

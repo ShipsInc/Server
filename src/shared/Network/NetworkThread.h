@@ -67,7 +67,7 @@ public:
         return _connections;
     }
 
-    virtual void AddSocket(std::shared_ptr<Socket> sock)
+    void AddSocket(std::shared_ptr<Socket> sock)
     {
         std::lock_guard<std::mutex> lock(_newSocketsLock);
 
@@ -106,7 +106,7 @@ protected:
     {
         std::cout << "Network Thread Starting" << std::endl;
 
-        SocketSet::iterator i, t;
+        SocketSet::iterator i;
 
         uint32 sleepTime = 10;
         uint32 tickStart = 0, diff = 0;

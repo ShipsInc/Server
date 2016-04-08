@@ -15,18 +15,20 @@
 
 #include <iostream>
 #include "SocketMgr.h"
+#include "AsyncAcceptor.h"
+#include "Socket.h"
 #include "Timer.h"
 #include "Server.h"
 #include "Database/DatabaseEnv.h"
 
 #include <boost/asio/io_service.hpp>
-#include <boost/bind/bind.hpp>
+#include <boost/bind.hpp>
 
 boost::asio::io_service _ioService;
 
 #define SERVER_SLEEP_CONST 50
 #define PORT 8085
-#define THREAD_POOL 2
+#define THREAD_POOL 6
 
 MySQLConnection Database;
 
@@ -58,14 +60,20 @@ void ServerUpdateLoop()
     }
 }
 
-int main()
+void ShutdownThreadPool(std::vector<std::thread>& threadPool)
+{
+    _ioService.stop();
+
+    for (auto& thread : threadPool)
+        thread.join();
+}
+
+int main(int argc, char** argv)
 {
 	std::cout << "Ships: Start server" << std::endl;
 
-    if (!Database.Open(MySQLConnectionInfo("localhost", "3036", "database", "root", "root")))
+    if (!Database.Open(MySQLConnectionInfo("localhost", "3036", "ships", "root", "root")))
         return 0;
-
-    sSocketMgr.StartNetwork(_ioService, "0.0.0.0", PORT, 1);
 
     // Start the Boost based thread pool
     int numThreads = THREAD_POOL;
@@ -73,11 +81,14 @@ int main()
     if (numThreads < 1)
         numThreads = 1;
 
+    sSocketMgr.StartNetwork(_ioService, "0.0.0.0", PORT, 1);
+
     for (int i = 0; i < numThreads; ++i)
         threadPool.push_back(std::thread(boost::bind(&boost::asio::io_service::run, &_ioService)));
 
     ServerUpdateLoop();
 
+    ShutdownThreadPool(threadPool);
     sSocketMgr.StopNetwork();
     Database.Close();
     return 0;

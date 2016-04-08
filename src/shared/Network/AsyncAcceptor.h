@@ -32,9 +32,6 @@ public:
     {
     }
 
-    template <class T>
-    void AsyncAccept();
-
     void AsyncAcceptManaged(ManagerAcceptHandler mgrHandler)
     {
         _acceptor.async_accept(_socket, [this, mgrHandler](boost::system::error_code error)
@@ -62,6 +59,9 @@ public:
         if (_closed.exchange(true))
             return;
 
+        if (!_acceptor.is_open())
+            return;
+
         boost::system::error_code err;
         _acceptor.close(err);
     }
@@ -71,29 +71,5 @@ private:
     tcp::socket _socket;
     std::atomic<bool> _closed;
 };
-
-template<class T>
-void AsyncAcceptor::AsyncAccept()
-{
-    _acceptor.async_accept(_socket, [this](boost::system::error_code error)
-    {
-        if (!error)
-        {
-            try
-            {
-                // this-> is required here to fix an segmentation fault in gcc 4.7.2 - reason is lambdas in a templated class
-                std::make_shared<T>(std::move(this->_socket))->Start();
-            }
-            catch (boost::system::system_error const& err)
-            {
-                std::cout << "Failed to retrieve client's remote address " << err.what() << std::endl;
-            }
-        }
-
-        // lets slap some more this-> on this so we can fix this bug with gcc 4.7.2 throwing internals in yo face
-        if (!_closed)
-            this->AsyncAccept<T>();
-    });
-}
 
 #endif /* __ASYNCACCEPT_H_ */

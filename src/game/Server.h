@@ -20,9 +20,9 @@
 #include "Define.h"
 #include "LockedQueue.h"
 
-#include <unordered_map>
-
 class Session;
+
+#include <unordered_map>
 
 typedef std::unordered_map<uint32, Session*> SessionMap;
 
@@ -51,7 +51,6 @@ class Server
         static bool IsStopped() { return m_stopEvent; }
     private:
         static std::atomic<bool> m_stopEvent;
-
         LockedQueue<Session*> m_sessionQueue;
         SessionMap m_sessions;
 };

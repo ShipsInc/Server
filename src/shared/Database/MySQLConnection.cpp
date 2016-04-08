@@ -117,8 +117,6 @@ bool MySQLConnection::Execute(const char* sql)
         return false;
 
     {
-        uint32 _s = getMSTime();
-
         if (mysql_query(m_Mysql, sql))
         {
             uint32 lErrno = mysql_errno(m_Mysql);
@@ -154,8 +152,6 @@ bool MySQLConnection::_Query(const char *sql, MYSQL_RES **pResult, MYSQL_FIELD *
         return false;
 
     {
-        uint32 _s = getMSTime();
-
         if (mysql_query(m_Mysql, sql))
         {
             uint32 lErrno = mysql_errno(m_Mysql);
@@ -194,7 +190,6 @@ bool MySQLConnection::_HandleMySQLErrno(uint32 errNo)
         case CR_SERVER_LOST_EXTENDED:
         {
             m_reconnecting = true;
-            uint64 oldThreadId = mysql_thread_id(GetHandle());
             mysql_close(GetHandle());
             if (this->Open(m_connectionInfo))                           // Don't remove 'this' pointer unless you want to skip loading all prepared statements....
             {

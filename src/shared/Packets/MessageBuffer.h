@@ -24,21 +24,10 @@ class MessageBuffer
     typedef std::vector<uint8>::size_type size_type;
 
 public:
-    MessageBuffer() : _wpos(0), _rpos(0), _storage()
-    {
-        _storage.resize(4096);
-    }
-
-    explicit MessageBuffer(std::size_t initialSize) : _wpos(0), _rpos(0), _storage()
-    {
-        _storage.resize(initialSize);
-    }
-
-    MessageBuffer(MessageBuffer const& right) : _wpos(right._wpos), _rpos(right._rpos), _storage(right._storage)
-    {
-    }
-
-    MessageBuffer(MessageBuffer&& right) : _wpos(right._wpos), _rpos(right._rpos), _storage(right.Move()) { }
+    MessageBuffer();
+    explicit MessageBuffer(std::size_t initialSize);
+    MessageBuffer(MessageBuffer const& right);
+    MessageBuffer(MessageBuffer&& right);
 
     void Reset()
     {

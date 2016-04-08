@@ -19,7 +19,6 @@
 #include "AsyncAcceptor.h"
 #include "Define.h"
 #include "NetworkThread.h"
-#include "Socket.h"
 #include <boost/asio/ip/tcp.hpp>
 #include <memory>
 
@@ -28,7 +27,7 @@ using boost::asio::ip::tcp;
 class SocketMgr
 {
 public:
-    virtual ~SocketMgr()
+    ~SocketMgr()
     {
         //ASSERT(!_threads && !_acceptor && !_threadCount, "StopNetwork must be called prior to SocketMgr destruction");
     }

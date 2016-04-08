@@ -76,22 +76,6 @@ public:
         return true;
     }
 
-    template<class Checker>
-    bool next(T& result, Checker& check)
-    {
-        std::lock_guard<std::mutex> lock(_lock);
-
-        if (_queue.empty())
-            return false;
-
-        result = _queue.front();
-        if (!check.Process(result))
-            return false;
-
-        _queue.pop_front();
-        return true;
-    }
-
     //! Peeks at the top of the queue. Check if the queue is empty before calling! Remember to unlock after use if autoUnlock == false.
     T& peek(bool autoUnlock = false)
     {

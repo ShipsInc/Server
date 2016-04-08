@@ -15,11 +15,11 @@
 
 #include "Server.h"
 #include "Define.h"
+#include "Socket.h"
 
 #define SOCKET_TIMEOUT 30000
 
 class Packet;
-class Socket;
 
 class Session
 {
@@ -51,6 +51,9 @@ class Session
         }
 
         void SendPacket(Packet const* packet);
+        void QueuePacket(Packet* packet);
+
+        void Handle_NULL(Packet& recvPacket);
     private:
         std::shared_ptr<Socket> m_Socket;
         std::atomic<int32> m_timeOutTime; // Socket timeout
@@ -61,6 +64,8 @@ class Session
         std::string m_Address;
 
         bool m_forceExit;
+
+        LockedQueue<Packet*> _recvQueue;
 
         // Disable copy
         Session(Session const& right) = delete;

@@ -6,5 +6,6 @@
 # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-add_subdirectory(server)
 add_subdirectory(shared)
+add_subdirectory(game)
+add_subdirectory(ships)

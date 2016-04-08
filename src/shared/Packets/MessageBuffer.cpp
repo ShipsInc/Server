@@ -13,31 +13,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SHIPS_DEFINE_H
-#define SHIPS_DEFINE_H
+#include "MessageBuffer.h"
 
-#include "CompilerDefs.h"
+#include <sstream>
 
-#include <atomic>
-#include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+MessageBuffer::MessageBuffer() : _wpos(0), _rpos(0), _storage()
+{
+    _storage.resize(4096);
+}
 
-#include <time.h>
-#include <cmath>
+MessageBuffer::MessageBuffer(std::size_t initialSize) : _wpos(0), _rpos(0), _storage()
+{
+    _storage.resize(initialSize);
+}
 
-#include <map>
-#include <queue>
-#include <memory>
+MessageBuffer::MessageBuffer(MessageBuffer const& right) : _wpos(right._wpos), _rpos(right._rpos), _storage(right._storage)
+{
+}
 
-typedef int64_t int64;
-typedef int32_t int32;
-typedef int16_t int16;
-typedef int8_t int8;
-typedef uint64_t uint64;
-typedef uint32_t uint32;
-typedef uint16_t uint16;
-typedef uint8_t uint8;
-
-#endif //SHIPS_DEFINE_H
+MessageBuffer::MessageBuffer(MessageBuffer&& right) : _wpos(right._wpos), _rpos(right._rpos), _storage(right.Move()) { }

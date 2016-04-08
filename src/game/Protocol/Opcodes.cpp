@@ -13,15 +13,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _OPCODES_H
-#define _OPCODES_H
+#include "Opcodes.h"
+#include "Session.h"
 
-enum OpcodeMisc : uint32
+/// Correspondence between opcodes and their names
+OpcodeHandler opcodeTable[NUM_MSG_TYPES] =
 {
-    MAX_OPCODE                                                     = 0x1FFF,
-    NUM_OPCODE_HANDLERS                                            = (MAX_OPCODE + 1),
-    UNKNOWN_OPCODE                                                 = (0xFFFF + 1),
-    NULL_OPCODE                                                    = 0xBADD
+    /*0x001*/ { "CMSG_AUTH",                                  &Session::Handle_NULL                     },
+    /*0x002*/ { "SMSG_AUTH_RESPONSE",                         &Session::Handle_NULL                     },
+    /*0x003*/ { "CMSG_REGISTRATION",                          &Session::Handle_NULL                     },
+    /*0x004*/ { "SMSG_REGISTRATION_RESPONSE",                 &Session::Handle_NULL                     },
 };
-
-#endif

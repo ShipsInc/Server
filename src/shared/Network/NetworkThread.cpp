@@ -13,31 +13,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SHIPS_DEFINE_H
-#define SHIPS_DEFINE_H
+#include <thread>
+#include <chrono>
 
-#include "CompilerDefs.h"
-
-#include <atomic>
-#include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-#include <time.h>
-#include <cmath>
-
-#include <map>
-#include <queue>
-#include <memory>
-
-typedef int64_t int64;
-typedef int32_t int32;
-typedef int16_t int16;
-typedef int8_t int8;
-typedef uint64_t uint64;
-typedef uint32_t uint32;
-typedef uint16_t uint16;
-typedef uint8_t uint8;
-
-#endif //SHIPS_DEFINE_H
+#include "NetworkThread.h"

@@ -14,6 +14,7 @@
 */
 
 #include "SocketMgr.h"
+#include "Socket.h"
 
 static void OnSocketAccept(tcp::socket&& sock)
 {
@@ -76,8 +77,17 @@ void SocketMgr::Wait()
 
 void SocketMgr::OnSocketOpen(tcp::socket&& sock)
 {
-    size_t min = 0;
+    {
+        boost::system::error_code err;
+        sock.set_option(boost::asio::ip::tcp::no_delay(true), err);
+        if (err)
+        {
+            std::cout << "SocketMgr::OnSocketOpen sock.set_option(boost::asio::ip::tcp::no_delay) err = " << err.message().c_str() << std::endl;
+            return;
+        }
+    }
 
+    size_t min = 0;
     for (int32 i = 1; i < _threadCount; ++i)
         if (_threads[i].GetConnectionCount() < _threads[min].GetConnectionCount())
             min = i;
