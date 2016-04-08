@@ -16,11 +16,12 @@
 #ifndef __MySQLConnection_H
 #define __MySQLConnection_H
 
-#include <memory>
+#ifdef _WIN32
+#include <winsock2.h>
+#endif
+
 #include <mysql.h>
 #include "QueryResult.h"
-
-#include "Timer.h"
 
 struct MySQLConnectionInfo
 {
